@@ -24,6 +24,7 @@ object dmDadosDownloads: TdmDadosDownloads
       FieldName = 'CODIGO'
       Origin = 'CODIGO'
       ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
     end
     object tbLogDownloadURL: TStringField
       FieldName = 'URL'

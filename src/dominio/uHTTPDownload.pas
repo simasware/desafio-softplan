@@ -15,6 +15,7 @@ type
       FProgressoDownload: TProgressoDownload;
       FEventoDownload: TNotificacaoDownload;
       FDownloadInfo: TDownloadInfo;
+      procedure finalizaDownload(aStatusFinalizacao: TStatusDownload; aMensagemFinalizacao: string);
       procedure SetEvento(const aEvento: TNotificacaoDownload);
       function GetEvento: TNotificacaoDownload;
       procedure onReceiveDataEvent(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean);
@@ -52,8 +53,6 @@ begin
 end;
 
 destructor THTTPDownload.Destroy;
-var
-  observer: IDownloadObserver;
 begin
   self.FTHTTPClient.Free;
   self.FDownloadInfo.Free;
@@ -66,7 +65,7 @@ var
   aNomeArquivo: string;
   aRetornoHTTP: IHTTPResponse;
 begin
-  result := false;
+  result := true;
   aNomeArquivo := TRegex.match(aURL, '(?<=\/)[^\/\?#]+(?=[^\/]*$)').Value;
   self.FDownloadInfo.CaminhoArquivo := format('%s\%s', [aDiretorioDestino, aNomeArquivo]);
   arquivoDownload := TFileStream.Create(
@@ -78,19 +77,16 @@ begin
     aRetornoHTTP := FTHTTPClient.Get(aURL, arquivoDownload);
     if aRetornoHTTP.StatusCode <> 200 then
     begin
-      self.FDownloadInfo.StatusDownload := tsErro;
-      self.FDownloadInfo.DataFim := now;
-      self.FEventoDownload(self, self.FDownloadInfo, format(eDownloadErroHTTP,
+      self.finalizaDownload(tsErro, format(eDownloadErroHTTP,
       [aRetornoHTTP.StatusCode, aRetornoHTTP.StatusText]));
-      self.FDownloadAtivo := false;
+      result := false;
     end;
-    result := true;
   except
     on E: Exception do
     begin
        arquivoDownload.Free;
-       if Assigned(self.FEventoDownload) then
-          self.FEventoDownload(Self, self.FDownloadInfo, eDownloadErro);
+       finalizaDownload(tsErro, eDownloadErro);
+       result := false;
     end;
   end;
 
@@ -100,6 +96,15 @@ end;
 function THTTPDownload.downloadEmExecucao: boolean;
 begin
   result := FDownloadAtivo;
+end;
+
+procedure THTTPDownload.finalizaDownload(aStatusFinalizacao: TStatusDownload; aMensagemFinalizacao: string);
+begin
+  self.FDownloadAtivo := false;
+  self.FDownloadInfo.DataFim := now;
+  self.FDownloadInfo.StatusDownload := aStatusFinalizacao;
+  if Assigned(self.FEventoDownload) then
+    self.FEventoDownload(Self, self.FDownloadInfo, aMensagemFinalizacao);
 end;
 
 function THTTPDownload.GetEvento: TNotificacaoDownload;
@@ -126,13 +131,7 @@ begin
   FProgressoDownload.percentualDownload := (AReadCount * 100) / AContentLength;
   if AReadCount = AContentLength then
   begin
-    self.FDownloadAtivo := false;
-    if Assigned(self.FEventoDownload) then
-    begin
-      self.FDownloadInfo.DataFim := now;
-      self.FDownloadInfo.StatusDownload := tsFinalizado;
-      self.FEventoDownload(Self, self.FDownloadInfo, eDownloadConcluido);
-    end;
+    self.finalizaDownload(tsFinalizado, eDownloadConcluido);
   end;
   self.notificar;
 end;
@@ -140,12 +139,7 @@ end;
 procedure THTTPDownload.pararDownload;
 begin
   self.FDownloadAtivo := false;
-  if Assigned(self.FEventoDownload) then
-  begin
-    self.FDownloadInfo.DataFim := now;
-    self.FDownloadInfo.StatusDownload := tsAbortado;
-    self.FEventoDownload(Self, self.FDownloadInfo, eDownloadAbortado);
-  end;
+  self.finalizaDownload(tsAbortado, eDownloadAbortado);
 end;
 
 procedure THTTPDownload.removerObserver(observer: IDownloadObserver);

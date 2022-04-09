@@ -13,7 +13,11 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   {$ENDIF }
   DUnitX.TestFramework,
-  untMainTest in 'untMainTest.pas';
+  untMainTest in 'untMainTest.pas',
+  uIDownload in '..\src\dominio\uIDownload.pas',
+  uIDownloadObserver in '..\src\dominio\uIDownloadObserver.pas',
+  uHTTPDownload in '..\src\dominio\uHTTPDownload.pas',
+  uResourceMessages in '..\src\shared\uResourceMessages.pas';
 
 {$IFNDEF TESTINSIGHT}
 var

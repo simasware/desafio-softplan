@@ -5,4 +5,5 @@ Uma pequena aplicação exemplo de como utilizar Threads, princípios S.O.L.I.D 
 ### Desenvolvido com
 * Delphi: 10.4
 * SQLite para persistência do histórico de download
+* Testes com DUNITX
 

@@ -9,24 +9,6 @@ uses
   System.Threading, System.Actions, Vcl.ActnList;
 
 type
-  TDownloadMemoObserver = class(TInterfacedObject, IDownloadObserver)
-    private
-      FMemoDownload: TMemo;
-    public
-      procedure atualizarProgresso(progressoDownload: TProgressoDownload);
-      property MemoDownload: TMemo read FMemoDownload write FMemoDownload;
-  end;
-
-type
-  TDownloadProgressObserver = class(TInterfacedObject, IDownloadObserver)
-    private
-      FProgressBar: TProgressBar;
-    public
-      procedure atualizarProgresso(progressoDownload: TProgressoDownload);
-      property ProgressBar: TProgressBar read FProgressBar write FProgressBar;
-  end;
-
-type
   TfrmPrincipal = class(TForm)
     Panel1: TPanel;
     Label1: TLabel;
@@ -65,6 +47,7 @@ type
     fileDownload: IDownload;
     downloadFactory: TDownloadFactory;
     procedure onThreadTerminated(Sender: TObject);
+    procedure registraLogDownload(logDownload: TDownloadInfo);
   public
     { Public declarations }
   end;
@@ -136,7 +119,7 @@ end;
 
 procedure TfrmPrincipal.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  if assigned(fileDownload) then
+  if Assigned(fileDownload) then
   begin
     if fileDownload.downloadEmExecucao then
     begin
@@ -163,24 +146,11 @@ end;
 procedure TfrmPrincipal.NotifyDownload(Sender: TObject;
   const statusDownload: TDownloadInfo; const mensagemRetorno: string);
 begin
-  with dmDadosDownloads do
-  begin
-    tbLogDownload.active := true;
-    tbLogDownload.InsertRecord(
-      [
-        nil,
-        editDownloadURL.Text,
-        statusDownload.DataInicio,
-        statusDownload.DataFim,
-        Integer(statusDownload.StatusDownload),
-        statusDownload.CaminhoArquivo
-      ]
-    );
-  end;
   if statusDownload.StatusDownload in [tsAbortado, tsErro] then
     DeleteFile(statusDownload.CaminhoArquivo);
   Application.MessageBox(PWideChar(mensagemRetorno), 'Download', MB_ICONINFORMATION);
   self.FThreadDownload.Terminate;
+  registraLogDownload(statusDownload);
 end;
 
 procedure TfrmPrincipal.onThreadTerminated(Sender: TObject);
@@ -196,31 +166,23 @@ begin
 
 end;
 
-{ TDownloadProgressBarObserver }
-
-procedure TDownloadMemoObserver.atualizarProgresso(
-  progressoDownload: TProgressoDownload);
-var
-  statusDownload: TStrings;
+procedure TfrmPrincipal.registraLogDownload(logDownload: TDownloadInfo);
 begin
-  statusDownload := TStringList.Create;
-
-  statusDownload.Add(format('Tamanho do arquivo: %2.f MB', [progressoDownload.tamanhoArquivo]));
-  statusDownload.Add(format('Total baixado     : %2.f MB', [progressoDownload.totalBaixado]));
-  statusDownload.Add(format('Percentual baixado: %2.f %%', [progressoDownload.percentualDownload]));
-  self.FMemoDownload.Lines.text := statusDownload.Text;
-  statusDownload.Free;
-  application.ProcessMessages;
-end;
-
-{ TDownloadProgressObserver }
-
-procedure TDownloadProgressObserver.atualizarProgresso(
-  progressoDownload: TProgressoDownload);
-begin
-  if self.FProgressBar.Max = 0 then
-    self.FProgressBar.Max := round(progressoDownload.tamanhoArquivo);
-  self.ProgressBar.Position := round(progressoDownload.totalBaixado);
+  with dmDadosDownloads do
+  begin
+    tbLogDownload.active := true;
+    tbLogDownload.InsertRecord(
+      [
+        nil,
+        editDownloadURL.Text,
+        logDownload.DataInicio,
+        logDownload.DataFim,
+        Integer(logDownload.StatusDownload),
+        logDownload.CaminhoArquivo
+      ]
+    );
+    tbLogDownload.Close;
+  end;
 end;
 
 end.

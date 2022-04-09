@@ -38,6 +38,8 @@ implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
+uses uResourceMessages;
+
 {$R *.dfm}
 
 procedure TdmDadosDownloads.DataModuleCreate(Sender: TObject);
@@ -47,11 +49,8 @@ end;
 
 procedure TdmDadosDownloads.tbLogDownloadCalcFields(DataSet: TDataSet);
 begin
-  case dataSet.FieldByName('STATUSFINALIZACAO').AsInteger of
-    1: dataSet.FieldByName('statusDescricao').asString := 'Sucesso';
-    2: dataSet.FieldByName('statusDescricao').asString := 'Abortado';
-    3: dataSet.FieldByName('statusDescricao').asString := 'Falha';
-  end;
+  dataSet.FieldByName('statusDescricao').AsString :=
+    TDownloadStatus[dataSet.FieldByName('STATUSFINALIZACAO').AsInteger];
   dataset.FieldByName('tempoDecorrido').AsDateTime :=
     dataSet.FieldByName('DATAFIM').AsDateTime -
     dataSet.FieldByName('DATAINICIO').AsDateTime;
