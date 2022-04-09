@@ -46,6 +46,7 @@ type
     FDownloadProgress: TDownloadProgressObserver;
     fileDownload: IDownload;
     downloadFactory: TDownloadFactory;
+    FHabilitaControles: boolean;
     procedure onThreadTerminated(Sender: TObject);
     procedure registraLogDownload(logDownload: TDownloadInfo);
   public
@@ -71,8 +72,7 @@ end;
 
 procedure TfrmPrincipal.actAlterarDiretorioDownloadUpdate(Sender: TObject);
 begin
-  if Assigned(self.FThreadDownload) then
-    TAction(Sender).Enabled := self.FThreadDownload.Finished;
+  TAction(Sender).Enabled := self.FHabilitaControles;
 end;
 
 procedure TfrmPrincipal.actHistoricoDownloadExecute(Sender: TObject);
@@ -102,6 +102,7 @@ begin
   );
   FThreadDownload.OnTerminate := self.onThreadTerminated;
   FThreadDownload.Start;
+  self.FHabilitaControles := false;
 end;
 
 procedure TfrmPrincipal.actPararDownloadExecute(Sender: TObject);
@@ -111,10 +112,7 @@ end;
 
 procedure TfrmPrincipal.actPararDownloadUpdate(Sender: TObject);
 begin
-  if Assigned(self.FThreadDownload) then
-    TAction(Sender).Enabled := self.FThreadDownload.Started
-  else
-    TAction(Sender).Enabled := false;
+  TAction(Sender).Enabled := not self.FHabilitaControles;
 end;
 
 procedure TfrmPrincipal.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -123,11 +121,13 @@ begin
   begin
     if fileDownload.downloadEmExecucao then
     begin
-      self.FThreadDownload.Terminate;
       canClose := application.MessageBox(
         'Existe um download em andamento. Deseja fechar?',
         'Finalizar aplicação',
         MB_ICONQUESTION+MB_YESNO) = mrYes;
+      if canClose then
+        fileDownload.pararDownload;
+
     end;
   end;
 end;
@@ -141,6 +141,7 @@ begin
   FDownloadObserver.MemoDownload := memProgressoDownload;
   FDownloadProgress := TDownloadProgressObserver.Create;
   FDownloadProgress.ProgressBar := pgDownloadArquivo;
+  FHabilitaControles := true;
 end;
 
 procedure TfrmPrincipal.NotifyDownload(Sender: TObject;
@@ -149,8 +150,8 @@ begin
   if statusDownload.StatusDownload in [tsAbortado, tsErro] then
     DeleteFile(statusDownload.CaminhoArquivo);
   Application.MessageBox(PWideChar(mensagemRetorno), 'Download', MB_ICONINFORMATION);
-  self.FThreadDownload.Terminate;
   registraLogDownload(statusDownload);
+  self.FHabilitaControles := true;
 end;
 
 procedure TfrmPrincipal.onThreadTerminated(Sender: TObject);
@@ -163,7 +164,6 @@ begin
       ), 'Falha ao efetuar download', MB_ICONERROR
     );
   end;
-
 end;
 
 procedure TfrmPrincipal.registraLogDownload(logDownload: TDownloadInfo);

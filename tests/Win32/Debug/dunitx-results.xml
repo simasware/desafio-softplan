@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<test-results name="C:\Users\fernando.simas\Documents\Embarcadero\Studio\Projects\fileDownload\tests\Win32\Debug\fileDownloadTests.exe" total="2" errors="0" failures="0" ignored="0" inconclusive="0" not-run="0" skipped="0" invalid="0" date="2022-04-09" time="15.944">
+<test-results name="C:\Users\fernando.simas\Documents\Embarcadero\Studio\Projects\fileDownload\tests\Win32\Debug\fileDownloadTests.exe" total="2" errors="0" failures="0" ignored="0" inconclusive="0" not-run="0" skipped="0" invalid="0" date="2022-04-09" time="5.080">
   <culture-info current-culture="en" current-uiculture="en" />
-  <test-suite type="Assembly" name="fileDownloadTests.exe" executed="true" result="Success" success="True" time="15.944" asserts="0">
+  <test-suite type="Assembly" name="fileDownloadTests.exe" executed="true" result="Success" success="True" time="5.080" asserts="0">
     <results>
-        <test-suite type="Namespace" name="untMainTest" executed="true" result="Success" success="True" time="15.943" asserts="0" >
+        <test-suite type="Namespace" name="untMainTest" executed="true" result="Success" success="True" time="5.079" asserts="0" >
           <results>
-              <test-suite type="Fixture" name="TMyTestObject" executed="True" result="Success" success="True" time="15.943" >
+              <test-suite type="Fixture" name="TMyTestObject" executed="True" result="Success" success="True" time="5.079" >
                 <results>
-                  <test-case name="TestDownloadHTTPSucesso.TestComSucesso" executed="True" result="Success" success="True" time="9.471" asserts="0" />
-                  <test-case name="TestDownloadHTTPErro.TestComErro" executed="True" result="Success" success="True" time="6.284" asserts="0" />
+                  <test-case name="TestDownloadHTTPSucesso.TestComSucesso" executed="True" result="Success" success="True" time="4.530" asserts="0" />
+                  <test-case name="TestDownloadHTTPErro.TestComErro" executed="True" result="Success" success="True" time="0.458" asserts="0" />
                 </results>
               </test-suite>
           </results>
