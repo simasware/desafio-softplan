@@ -5,9 +5,7 @@ object dmDadosDownloads: TdmDadosDownloads
   Width = 464
   object fdDownloadAPPDB: TFDConnection
     Params.Strings = (
-      
-        'Database=C:\Users\fernando.simas\Documents\Embarcadero\Studio\Pr' +
-        'ojects\fileDownload\bin\downloadApp.db'
+      'Database=downloadApp.db'
       'DriverID=SQLite')
     LoginPrompt = False
     Left = 48
