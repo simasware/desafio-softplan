@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{261FAF79-EEAB-4648-9B76-209C1DD87D62}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="delphiDownloader.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\tests\fileDownloadTests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="delphiDownloader">
+        <MSBuild Projects="delphiDownloader.dproj"/>
+    </Target>
+    <Target Name="delphiDownloader:Clean">
+        <MSBuild Projects="delphiDownloader.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="delphiDownloader:Make">
+        <MSBuild Projects="delphiDownloader.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="fileDownloadTests">
+        <MSBuild Projects="..\tests\fileDownloadTests.dproj"/>
+    </Target>
+    <Target Name="fileDownloadTests:Clean">
+        <MSBuild Projects="..\tests\fileDownloadTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="fileDownloadTests:Make">
+        <MSBuild Projects="..\tests\fileDownloadTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="delphiDownloader;fileDownloadTests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="delphiDownloader:Clean;fileDownloadTests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="delphiDownloader:Make;fileDownloadTests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
