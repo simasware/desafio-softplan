@@ -7,3 +7,6 @@ Uma pequena aplicação exemplo de como utilizar Threads, princípios S.O.L.I.D 
 * SQLite para persistência do histórico de download
 * Testes com DUNITX
 
+### Instruções para execução
+
+O binário encontra-se na pasta bin. Basta executar o aplicativo.
